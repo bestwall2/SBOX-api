@@ -28,32 +28,46 @@ async def index():
 @app.get('/vidsrc/{dbid}')
 async def vidsrc(dbid: str, s: int = None, e: int = None):
     if dbid:
-        return {
-            "status": 200,
-            "info": "success",
-            "sources": await vidsrctoget(dbid, s, e)
-        }
+        sources = await vidsrctoget(dbid, s, e)
+        if isinstance(sources, list):
+            return {
+                "status": 200,
+                "info": "success",
+                "sources": sources
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Unexpected response format from vidsrctoget")
     else:
         raise HTTPException(status_code=404, detail=f"Invalid id: {dbid}")
 
 @app.get('/vsrcme/{dbid}')
 async def vsrcme(dbid: str = '', s: int = None, e: int = None, l: str = 'eng'):
     if dbid:
-        return {
-            "status": 200,
-            "info": "success",
-            "sources": await vidsrcmeget(dbid, s, e)
-        }
+        sources = await vidsrcmeget(dbid, s, e)
+        if isinstance(sources, list):
+            return {
+                "status": 200,
+                "info": "success",
+                "sources": sources
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Unexpected response format from vidsrcmeget")
     else:
         raise HTTPException(status_code=404, detail=f"Invalid id: {dbid}")
 
 @app.get('/streams/{dbid}')
 async def streams(dbid: str = '', s: int = None, e: int = None, l: str = 'eng'):
     if dbid:
+        vidsrcme_sources = await vidsrcmeget(dbid, s, e)
+        vidsrctoget_sources = await vidsrctoget(dbid, s, e)
+
+        if not isinstance(vidsrcme_sources, list) or not isinstance(vidsrctoget_sources, list):
+            raise HTTPException(status_code=500, detail="Unexpected response format from source functions")
+
         return {
             "status": 200,
             "info": "success",
-            "sources": await vidsrcmeget(dbid, s, e) + await vidsrctoget(dbid, s, e)
+            "sources": vidsrcme_sources + vidsrctoget_sources
         }
     else:
         raise HTTPException(status_code=404, detail=f"Invalid id: {dbid}")
