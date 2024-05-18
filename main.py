@@ -59,15 +59,15 @@ async def vsrcme(dbid: str = '', s: int = None, e: int = None, l: str = 'eng'):
 async def streams(dbid: str = '', s: int = None, e: int = None, l: str = 'eng'):
     if dbid:
         vidsrcme_sources = await vidsrcmeget(dbid, s, e)
-        vidsrctoget_sources = await vidsrctoget(dbid, s, e)
+       # vidsrctoget_sources = await vidsrctoget(dbid, s, e)
 
-        if not isinstance(vidsrcme_sources, list) or not isinstance(vidsrctoget_sources, list):
-            raise HTTPException(status_code=500, detail="Unexpected response format from source functions")
+       # if not isinstance(vidsrcme_sources, list) or not isinstance(vidsrctoget_sources, list):
+          #  raise HTTPException(status_code=500, detail="Unexpected response format from source functions")
 
         return {
             "status": 200,
             "info": "success",
-            "sources": vidsrcme_sources + vidsrctoget_sources
+            "sources": vidsrcme_sources
         }
     else:
         raise HTTPException(status_code=404, detail=f"Invalid id: {dbid}")
